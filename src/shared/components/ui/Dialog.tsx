@@ -9,7 +9,7 @@ const Dialog = React.forwardRef<HTMLDialogElement, DialogProps>(
       <dialog
         ref={ref}
         className={cn(
-          "m-auto backdrop:bg-black/60 bg-neutral-950 border border-neutral-800 p-0 rounded-lg shadow-2xl text-neutral-100 max-w-md w-full",
+          "m-auto overflow-visible backdrop:bg-black/60 bg-neutral-950 border border-neutral-800 p-0 rounded-lg shadow-2xl text-neutral-100 max-w-md w-full",
           className
         )}
         {...props}
