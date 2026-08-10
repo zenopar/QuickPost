@@ -14,6 +14,14 @@ const config: StorybookConfig = {
   "framework": "@storybook/nextjs-vite",
   "staticDirs": [
     "..\\public"
-  ]
+  ],
+  async viteFinal(config) {
+    const { mergeConfig } = await import('vite');
+    return mergeConfig(config, {
+      optimizeDeps: {
+        include: ['lucide-react'],
+      },
+    });
+  }
 };
 export default config;
