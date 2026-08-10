@@ -15,7 +15,7 @@ interface RequestContextValue {
 const defaultRequest: HttpRequest = {
   id: "default-req",
   method: "GET",
-  url: "https://jsonplaceholder.typicode.com/todos/1",
+  url: "",
   queryParams: [],
   headers: [],
   auth: { type: "none" },
