@@ -3,6 +3,7 @@
 import * as React from "react"
 import { HttpRequest, HttpResponse, HttpMethod } from "../types"
 import { executeHttpRequest } from "../actions/execute-request"
+import { useStorageContext } from "./StorageContext"
 
 interface RequestContextValue {
   request: HttpRequest
@@ -28,12 +29,16 @@ export function RequestProvider({ children }: { children: React.ReactNode }) {
   const [request, setRequest] = React.useState<HttpRequest>(defaultRequest)
   const [response, setResponse] = React.useState<HttpResponse | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
+  const { addToHistory } = useStorageContext()
 
   const execute = async () => {
+    if (!request.url) return
+
     setIsLoading(true)
     try {
       const result = await executeHttpRequest(request)
       setResponse(result)
+      addToHistory(request, result)
     } catch (error) {
       console.error("Failed to execute request", error)
       setResponse({
