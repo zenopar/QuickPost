@@ -10,6 +10,7 @@ interface StorageContextValue {
   addToHistory: (request: HttpRequest, response: HttpResponse) => void
   clearHistory: () => void
   addCollection: (name: string) => void
+  importCollection: (collection: CollectionItem) => void
   deleteCollection: (collectionId: string) => void
   renameCollection: (collectionId: string, newName: string) => void
   saveToCollection: (collectionId: string, request: HttpRequest) => void
@@ -89,6 +90,10 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
     })
   }, [])
 
+  const importCollection = React.useCallback((collection: CollectionItem) => {
+    setCollections(prev => [...prev, collection])
+  }, [])
+
   const deleteCollection = React.useCallback((collectionId: string) => {
     setCollections(prev => prev.filter(col => col.id !== collectionId))
   }, [])
@@ -134,6 +139,7 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
       addToHistory,
       clearHistory,
       addCollection,
+      importCollection,
       deleteCollection,
       renameCollection,
       saveToCollection,

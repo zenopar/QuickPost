@@ -65,7 +65,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to start usi
 - [x] Request builder with method selector, query params, headers, and body editor
 - [x] Response viewer with status indicators, execution time metrics, and syntax highlighting
 - [x] Local storage persistence for request history and custom collections
-- [ ] Import and export Postman collections (v2.1 JSON)
+- [x] Import and export Postman collections (v2.1 JSON)
 
 ---
 
