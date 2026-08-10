@@ -1,4 +1,3 @@
-import * as React from "react"
 import { Folder, History, Plus } from "lucide-react"
 import { Button } from "@/shared/components/ui/Button"
 
