@@ -33,7 +33,7 @@ QuickPost is a lightweight, distraction-free REST API client alternative to Post
 First, clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/zenocz/QuickPost.git
+git clone https://github.com/zenopar/QuickPost.git
 cd QuickPost
 npm install
 ```
