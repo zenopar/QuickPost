@@ -47,75 +47,79 @@ export function KeyValueEditor({
 
   return (
     <div className="w-full flex flex-col h-full overflow-hidden border border-neutral-800 rounded-md bg-neutral-950">
-      <div className="flex border-b border-neutral-800 bg-neutral-900 text-xs font-medium text-neutral-400">
-        <div className="w-10 flex items-center justify-center border-r border-neutral-800 py-2"></div>
-        <div className="flex-1 px-3 py-2 border-r border-neutral-800">Key</div>
-        <div className="flex-1 px-3 py-2 border-r border-neutral-800">Value</div>
-        <div className="flex-1 px-3 py-2 border-r border-neutral-800">Description</div>
-        <div className="w-10"></div>
-      </div>
-      <div className="flex-1 overflow-y-auto">
-        {displayItems.map((item, index) => {
-          const isEmptyRow = item.key === "" && item.value === "" && index === displayItems.length - 1;
+      <div className="overflow-x-auto">
+        <div className="min-w-[500px]">
+          <div className="flex border-b border-neutral-800 bg-neutral-900 text-xs font-medium text-neutral-400">
+            <div className="w-10 flex items-center justify-center border-r border-neutral-800 py-2"></div>
+            <div className="flex-1 px-3 py-2 border-r border-neutral-800">Key</div>
+            <div className="flex-1 px-3 py-2 border-r border-neutral-800">Value</div>
+            <div className="flex-1 px-3 py-2 border-r border-neutral-800">Description</div>
+            <div className="w-10"></div>
+          </div>
+          <div className="flex flex-col">
+            {displayItems.map((item, index) => {
+              const isEmptyRow = item.key === "" && item.value === "" && index === displayItems.length - 1;
 
-          return (
-            <div key={item.id} className="flex border-b border-neutral-800/50 group hover:bg-neutral-900/30 transition-colors">
-              <div className="w-10 flex items-center justify-center border-r border-neutral-800/50">
-                {!isEmptyRow && (
-                  <input
-                    type="checkbox"
-                    checked={item.enabled}
-                    onChange={(e) => updateItem(index, "enabled", e.target.checked)}
-                    className="w-3.5 h-3.5 rounded-sm border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-neutral-950 cursor-pointer"
-                  />
-                )}
-              </div>
-              <div className="flex-1 border-r border-neutral-800/50">
-                <Input
-                  type="text"
-                  value={item.key}
-                  onChange={(e) => updateItem(index, "key", e.target.value)}
-                  placeholder={placeholderKey}
-                  className="h-8 border-0 bg-transparent rounded-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-neutral-700 focus-visible:ring-offset-0 placeholder:text-neutral-600 px-3"
-                  spellCheck={false}
-                />
-              </div>
-              <div className="flex-1 border-r border-neutral-800/50">
-                <Input
-                  type="text"
-                  value={item.value}
-                  onChange={(e) => updateItem(index, "value", e.target.value)}
-                  placeholder={placeholderValue}
-                  className="h-8 border-0 bg-transparent rounded-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-neutral-700 focus-visible:ring-offset-0 placeholder:text-neutral-600 px-3"
-                  spellCheck={false}
-                />
-              </div>
-              <div className="flex-1 border-r border-neutral-800/50">
-                <Input
-                  type="text"
-                  value={item.description || ""}
-                  onChange={(e) => updateItem(index, "description", e.target.value)}
-                  placeholder="Description"
-                  className="h-8 border-0 bg-transparent rounded-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-neutral-700 focus-visible:ring-offset-0 placeholder:text-neutral-700 px-3 text-neutral-400"
-                  spellCheck={false}
-                />
-              </div>
-              <div className="w-10 flex items-center justify-center">
-                {!isEmptyRow && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeItem(item.id)}
-                    className="h-6 w-6 text-neutral-600 hover:text-red-400 hover:bg-neutral-800 opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Remove item"
-                  >
-                    <Trash2 size={14} />
-                  </Button>
-                )}
-              </div>
-            </div>
-          )
-        })}
+              return (
+                <div key={item.id} className="flex border-b border-neutral-800/50 group hover:bg-neutral-900/30 transition-colors">
+                  <div className="w-10 flex items-center justify-center border-r border-neutral-800/50">
+                    {!isEmptyRow && (
+                      <input
+                        type="checkbox"
+                        checked={item.enabled}
+                        onChange={(e) => updateItem(index, "enabled", e.target.checked)}
+                        className="w-3.5 h-3.5 rounded-sm border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-neutral-950 cursor-pointer"
+                      />
+                    )}
+                  </div>
+                  <div className="flex-1 border-r border-neutral-800/50">
+                    <Input
+                      type="text"
+                      value={item.key}
+                      onChange={(e) => updateItem(index, "key", e.target.value)}
+                      placeholder={placeholderKey}
+                      className="h-8 border-0 bg-transparent rounded-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-neutral-700 focus-visible:ring-offset-0 placeholder:text-neutral-600 px-3"
+                      spellCheck={false}
+                    />
+                  </div>
+                  <div className="flex-1 border-r border-neutral-800/50">
+                    <Input
+                      type="text"
+                      value={item.value}
+                      onChange={(e) => updateItem(index, "value", e.target.value)}
+                      placeholder={placeholderValue}
+                      className="h-8 border-0 bg-transparent rounded-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-neutral-700 focus-visible:ring-offset-0 placeholder:text-neutral-600 px-3"
+                      spellCheck={false}
+                    />
+                  </div>
+                  <div className="flex-1 border-r border-neutral-800/50">
+                    <Input
+                      type="text"
+                      value={item.description || ""}
+                      onChange={(e) => updateItem(index, "description", e.target.value)}
+                      placeholder="Description"
+                      className="h-8 border-0 bg-transparent rounded-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-neutral-700 focus-visible:ring-offset-0 placeholder:text-neutral-700 px-3 text-neutral-400"
+                      spellCheck={false}
+                    />
+                  </div>
+                  <div className="w-10 flex items-center justify-center">
+                    {!isEmptyRow && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeItem(item.id)}
+                        className="h-6 w-6 text-neutral-600 hover:text-red-400 hover:bg-neutral-800 opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Remove item"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -4,7 +4,7 @@ import { ResponseViewer } from "./ResponseViewer"
 
 export function Workspace() {
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-neutral-950 text-neutral-100 p-6 pl-0">
+    <div className="flex-1 flex flex-col min-w-0 bg-neutral-950 text-neutral-100 p-2 md:p-6 md:pl-0">
       <RequestPanel />
       {/* We use flex-1 for the split view area to take remaining space, and split it vertically */}
       <div className="flex-1 flex flex-col min-h-0">

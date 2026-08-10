@@ -5,7 +5,7 @@ import { Providers } from "@/features/http-client/context/Providers"
 export default function Home() {
   return (
     <Providers>
-      <main className="flex h-screen w-full overflow-hidden bg-neutral-950 text-neutral-100">
+      <main className="flex h-screen w-full overflow-hidden bg-neutral-950 text-neutral-100 flex-col md:flex-row">
         <Sidebar />
         <Workspace />
       </main>

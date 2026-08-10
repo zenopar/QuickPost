@@ -1,12 +1,15 @@
 "use client"
-import { Folder, History, Plus, FileCode2, Edit2, Trash2 } from "lucide-react"
+import * as React from "react"
+import { Folder, History, Plus, Edit2, Trash2, Menu, X } from "lucide-react"
 import { Button } from "@/shared/components/ui/Button"
 import { useStorageContext } from "../context/StorageContext"
 import { useRequestContext } from "../context/RequestContext"
+import { cn } from "@/shared/utils/cn"
 
 export function Sidebar() {
   const { collections, history, addCollection, deleteCollection, renameCollection, deleteRequestFromCollection } = useStorageContext()
   const { setRequest } = useRequestContext()
+  const [isOpen, setIsOpen] = React.useState(false)
 
   const handleAddCollection = () => {
     const name = window.prompt("Enter collection name:")
@@ -15,14 +18,45 @@ export function Sidebar() {
     }
   }
 
+  const handleSelectRequest = (req: any) => {
+    setRequest(req)
+    setIsOpen(false) // Close drawer on mobile after selection
+  }
+
   return (
-    <aside className="w-64 border-r border-neutral-800 bg-neutral-950 flex flex-col">
-      <div className="p-4 border-b border-neutral-800 flex items-center justify-between shrink-0">
-        <h2 className="font-semibold text-neutral-200">Collections</h2>
-        <Button variant="ghost" size="icon" className="h-6 w-6 text-neutral-400 hover:text-neutral-100" onClick={handleAddCollection}>
-          <Plus size={16} />
+    <>
+      {/* Mobile Top Bar */}
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-950 shrink-0">
+        <div className="font-bold text-lg text-emerald-500">QuickPost</div>
+        <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
+          <Menu size={20} />
         </Button>
       </div>
+
+      {/* Backdrop overlay for mobile */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/60 md:hidden" 
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Sidebar container */}
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-50 w-72 bg-neutral-950 border-r border-neutral-800 flex flex-col transition-transform duration-300 ease-in-out md:relative md:w-64 md:translate-x-0",
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="p-4 border-b border-neutral-800 flex items-center justify-between shrink-0">
+          <h2 className="font-semibold text-neutral-200">Collections</h2>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-neutral-400 hover:text-neutral-100" onClick={handleAddCollection}>
+              <Plus size={16} />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-neutral-400 hover:text-neutral-100 md:hidden" onClick={() => setIsOpen(false)}>
+              <X size={16} />
+            </Button>
+          </div>
+        </div>
       
       <div className="flex-1 overflow-y-auto p-2 space-y-4">
         {/* Collections */}
@@ -59,7 +93,7 @@ export function Sidebar() {
                     <Button 
                       variant="ghost" 
                       className="flex-1 justify-start gap-2 pl-8 pr-1 py-1 h-auto text-neutral-400 hover:text-neutral-200 font-normal text-xs min-w-0"
-                      onClick={() => setRequest(req)}
+                      onClick={() => handleSelectRequest(req)}
                     >
                       <span className={`font-semibold shrink-0 ${
                         req.method === 'GET' ? 'text-emerald-500' : 
@@ -106,7 +140,7 @@ export function Sidebar() {
                   key={item.id} 
                   variant="ghost" 
                   className="w-full justify-start gap-2 px-3 py-1.5 h-auto text-neutral-400 hover:text-neutral-200 font-normal text-xs"
-                  onClick={() => setRequest(item.request)}
+                  onClick={() => handleSelectRequest(item.request)}
                 >
                   <span className={`font-semibold w-10 text-left shrink-0 ${
                     item.request.method === 'GET' ? 'text-emerald-500' : 
@@ -124,5 +158,6 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   )
 }
