@@ -1,8 +1,11 @@
+import { Sidebar } from "@/features/http-client/components/Sidebar"
+import { Workspace } from "@/features/http-client/components/Workspace"
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center p-8">
-      <h1 className="text-2xl font-bold">QuickPost</h1>
+    <main className="flex h-screen w-full overflow-hidden bg-neutral-950 text-neutral-100">
+      <Sidebar />
+      <Workspace />
     </main>
   );
 }
-
