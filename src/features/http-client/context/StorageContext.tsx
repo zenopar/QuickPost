@@ -10,7 +10,10 @@ interface StorageContextValue {
   addToHistory: (request: HttpRequest, response: HttpResponse) => void
   clearHistory: () => void
   addCollection: (name: string) => void
+  deleteCollection: (collectionId: string) => void
+  renameCollection: (collectionId: string, newName: string) => void
   saveToCollection: (collectionId: string, request: HttpRequest) => void
+  deleteRequestFromCollection: (collectionId: string, requestId: string) => void
 }
 
 const StorageContext = React.createContext<StorageContextValue | undefined>(undefined)
@@ -86,12 +89,36 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
     })
   }, [])
 
+  const deleteCollection = React.useCallback((collectionId: string) => {
+    setCollections(prev => prev.filter(col => col.id !== collectionId))
+  }, [])
+
+  const renameCollection = React.useCallback((collectionId: string, newName: string) => {
+    if (!newName.trim()) return
+    setCollections(prev => prev.map(col => 
+      col.id === collectionId ? { ...col, name: newName.trim(), updatedAt: Date.now() } : col
+    ))
+  }, [])
+
   const saveToCollection = React.useCallback((collectionId: string, request: HttpRequest) => {
     setCollections(prev => prev.map(col => {
       if (col.id === collectionId) {
         return {
           ...col,
           requests: [...col.requests, { ...request, id: crypto.randomUUID() }],
+          updatedAt: Date.now()
+        }
+      }
+      return col
+    }))
+  }, [])
+
+  const deleteRequestFromCollection = React.useCallback((collectionId: string, requestId: string) => {
+    setCollections(prev => prev.map(col => {
+      if (col.id === collectionId) {
+        return {
+          ...col,
+          requests: col.requests.filter(req => req.id !== requestId),
           updatedAt: Date.now()
         }
       }
@@ -107,7 +134,10 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
       addToHistory,
       clearHistory,
       addCollection,
-      saveToCollection
+      deleteCollection,
+      renameCollection,
+      saveToCollection,
+      deleteRequestFromCollection
     }}>
       {children}
     </StorageContext.Provider>
