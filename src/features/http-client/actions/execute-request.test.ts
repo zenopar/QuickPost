@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { executeHttpRequest } from './execute-request';
 import { HttpRequest } from '../types';
 import { resetRateLimiter } from '../../../shared/lib/rate-limiter';
@@ -9,9 +9,20 @@ vi.mock('next/headers', () => ({
 }));
 
 describe('executeHttpRequest Server Action', () => {
+  const originalAllowLocal = process.env.ALLOW_LOCAL_REQUESTS;
+
   beforeEach(() => {
     vi.restoreAllMocks();
     resetRateLimiter(); // Reset Rate Limiter memory before each test
+    process.env.ALLOW_LOCAL_REQUESTS = 'false';
+  });
+
+  afterEach(() => {
+    if (originalAllowLocal === undefined) {
+      delete process.env.ALLOW_LOCAL_REQUESTS;
+    } else {
+      process.env.ALLOW_LOCAL_REQUESTS = originalAllowLocal;
+    }
   });
 
   it('should successfully execute a GET request and return formatted response', async () => {
@@ -132,6 +143,35 @@ describe('executeHttpRequest Server Action', () => {
     expect(response.status).toBe(403);
     expect(response.statusText).toBe('Forbidden');
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('should allow requests to localhost if ALLOW_LOCAL_REQUESTS is true', async () => {
+    process.env.ALLOW_LOCAL_REQUESTS = 'true';
+    
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        status: 200,
+        statusText: 'OK',
+        ok: true,
+        headers: new Map(),
+        text: async () => 'OK',
+      })
+    );
+
+    const mockRequest: HttpRequest = {
+      id: 'req-ssrf-local-allowed',
+      method: 'GET',
+      url: 'http://localhost:8080/admin',
+      queryParams: [],
+      headers: [],
+      auth: { type: 'none' },
+      body: { type: 'none' },
+    };
+
+    const response = await executeHttpRequest(mockRequest);
+    expect(response.status).toBe(200);
+    expect(fetch).toHaveBeenCalled();
   });
 
   it('should block requests to private IP ranges (SSRF protection)', async () => {

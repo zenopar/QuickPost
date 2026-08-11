@@ -32,8 +32,9 @@ export async function executeHttpRequest(request: HttpRequest): Promise<HttpResp
     // 1. Build URL with enabled query parameters
     const urlObj = new URL(request.url);
 
-    // SSRF Protection: Block localhost and local IP addresses (private networks)
-    if (isPrivateOrLocalHost(urlObj.hostname)) {
+    // SSRF Protection: Block localhost and local IP addresses (private networks) unless explicitly allowed
+    const allowLocal = process.env.ALLOW_LOCAL_REQUESTS === 'true';
+    if (!allowLocal && isPrivateOrLocalHost(urlObj.hostname)) {
       return {
         status: 403,
         statusText: 'Forbidden',
