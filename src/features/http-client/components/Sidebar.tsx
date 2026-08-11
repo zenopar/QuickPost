@@ -1,11 +1,12 @@
 "use client"
 import * as React from "react"
-import { Folder, History, Plus, Edit2, Trash2, Menu, X, Upload, Download } from "lucide-react"
+import { Folder, History, Plus, Edit2, Trash2, Menu, X, Upload, Download, Code2 } from "lucide-react"
 import { Button } from "@/shared/components/ui/Button"
 import { useStorageContext } from "../context/StorageContext"
 import { useRequestContext } from "../context/RequestContext"
 import { cn } from "@/shared/utils/cn"
 import { parsePostmanCollection, exportToPostmanCollection } from "../utils/postman"
+import packageJson from "../../../../package.json"
 
 export function Sidebar() {
   const { collections, history, addCollection, deleteCollection, renameCollection, deleteRequestFromCollection, importCollection } = useStorageContext()
@@ -209,6 +210,33 @@ export function Sidebar() {
             )}
           </div>
         </div>
+      </div>
+      
+      <div className="p-4 border-t border-neutral-800 shrink-0 flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <a 
+            href="https://github.com/zenopar/QuickPost" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors text-xs"
+          >
+            <Code2 className="w-3.5 h-3.5" />
+            Open-source project
+          </a>
+          <span className="text-neutral-600 text-xs font-mono">
+            v{packageJson.version}
+          </span>
+        </div>
+        {process.env.NEXT_PUBLIC_PRIVACY_URL && (
+          <a 
+            href={process.env.NEXT_PUBLIC_PRIVACY_URL} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-neutral-500 hover:text-neutral-300 transition-colors text-xs"
+          >
+            Privacy Policy
+          </a>
+        )}
       </div>
     </aside>
     </>
