@@ -8,7 +8,11 @@ import { cn } from "@/shared/utils/cn"
 import { parsePostmanCollection, exportToPostmanCollection } from "../utils/postman"
 import packageJson from "../../../../package.json"
 
-export function Sidebar() {
+interface SidebarProps {
+  privacyUrl?: string
+}
+
+export function Sidebar({ privacyUrl }: SidebarProps) {
   const { collections, history, addCollection, deleteCollection, renameCollection, deleteRequestFromCollection, importCollection } = useStorageContext()
   const { setRequest } = useRequestContext()
   const [isOpen, setIsOpen] = React.useState(false)
@@ -227,9 +231,9 @@ export function Sidebar() {
             v{packageJson.version}
           </span>
         </div>
-        {process.env.NEXT_PUBLIC_PRIVACY_URL && (
+        {privacyUrl && (
           <a 
-            href={process.env.NEXT_PUBLIC_PRIVACY_URL} 
+            href={privacyUrl} 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-neutral-500 hover:text-neutral-300 transition-colors text-xs"
