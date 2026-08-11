@@ -1,6 +1,13 @@
 # QuickPost
 
+![Version](https://img.shields.io/github/v/tag/zenopar/QuickPost?color=blue&label=version&style=flat-square)
+![License](https://img.shields.io/github/license/zenopar/QuickPost?color=green&style=flat-square)
+
 > A fast, privacy-first, open-source API Client built for modern web developers.
+
+**Live Demo:** [quickpost.partyka.pro](https://quickpost.partyka.pro)
+
+![QuickPost Interface](docs/images/web.png)
 
 QuickPost is a lightweight, distraction-free REST API client alternative to Postman. Built with speed and developer experience in mind, it allows you to compose HTTP requests, inspect responses in real-time, bypass browser CORS restrictions via Next.js Server Actions, and organize your API collections—all with local-first privacy.
 
@@ -9,7 +16,7 @@ QuickPost is a lightweight, distraction-free REST API client alternative to Post
 ## Features
 
 - **Lightning Fast & Modern UI**: Sleek dark mode design optimized for productivity without bloated background services.
-- **Full Request Builder**: Support for GET, POST, PUT, DELETE, PATCH, custom headers, query params, and JSON/Form-data body payload.
+- **Full Request Builder**: Support for GET, POST, PUT, DELETE, PATCH, custom headers, query params, and JSON/Form-data body payloads.
 - **Response Inspector**: Detailed HTTP status badges, response execution timing (in ms), payload size, formatted JSON viewer, and headers breakdown.
 - **CORS Proxy via Server Actions**: Solve web browser CORS limitations seamlessly using Next.js Server Actions.
 - **Built-in Rate Limiting**: Server Action protection preventing proxy abuse (IP-based limit).
@@ -20,15 +27,29 @@ QuickPost is a lightweight, distraction-free REST API client alternative to Post
 
 ## Tech Stack
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Server Actions & React 19)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Testing**: [Vitest](https://vitest.dev/)
-- **Icons**: [Lucide React](https://lucide.dev/)
+| Category | Technology |
+| :--- | :--- |
+| **Framework** | [Next.js 16](https://nextjs.org/) (App Router, Server Actions & React 19) |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) |
+| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) |
+| **Testing** | [Vitest](https://vitest.dev/) |
+| **Icons** | [Lucide React](https://lucide.dev/) |
 
 ---
 
 ## Getting Started
+
+### Docker (GitHub Packages)
+
+You can pull and run the pre-built image directly from the GitHub Container Registry:
+
+```bash
+docker run -p 3000:3000 -d ghcr.io/zenopar/quickpost:latest
+```
+
+*Note: Add `-e ALLOW_LOCAL_REQUESTS=true` to your docker run command if you need to test local APIs.*
+
+### Local Development
 
 First, clone the repository and install dependencies:
 
@@ -38,13 +59,22 @@ cd QuickPost
 npm install
 ```
 
+**Environment Setup:**
+Copy the example environment file. By default, proxying requests to local IP addresses is blocked for security reasons.
+
+```bash
+cp .env.example .env.local
+```
+
+Open `.env.local` and set `ALLOW_LOCAL_REQUESTS=true` if you need to test local APIs (e.g., `localhost`).
+
 Run the development server:
 
 ```bash
 npm run dev
 ```
 
-Run test suite:
+Run the test suite:
 
 ```bash
 npm test
@@ -54,21 +84,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to start usi
 
 ---
 
-## Roadmap
-
-- [x] Initial Next.js 16 & Tailwind CSS v4 bootstrap
-- [x] Core TypeScript HTTP data models & type definitions
-- [x] Server Action proxy handler for cross-origin requests
-- [x] IP-based Rate Limiter for Server Action proxy protection
-- [x] Vitest unit tests suite for Server Actions & utilities
-- [x] Responsive dark mode UI layout (Sidebar, Request Editor, Response Panel)
-- [x] Request builder with method selector, query params, headers, and body editor
-- [x] Response viewer with status indicators, execution time metrics, and syntax highlighting
-- [x] Local storage persistence for request history and custom collections
-- [x] Import and export Postman collections (v2.1 JSON)
-
----
-
 ## License
 
-Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information.
+Distributed under the MIT License. See [`LICENSE`](https://www.google.com/search?q=LICENSE) for more information.
