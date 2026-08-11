@@ -86,4 +86,4 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to start usi
 
 ## License
 
-Distributed under the MIT License. See [`LICENSE`](https://www.google.com/search?q=LICENSE) for more information.
+Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information.
