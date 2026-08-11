@@ -115,6 +115,47 @@ describe('executeHttpRequest Server Action', () => {
     expect(response.errorDetails).toContain('Failed to fetch');
   });
 
+  it('should block requests to localhost (SSRF protection)', async () => {
+    vi.stubGlobal('fetch', vi.fn());
+
+    const mockRequest: HttpRequest = {
+      id: 'req-ssrf-local',
+      method: 'GET',
+      url: 'http://localhost:8080/admin',
+      queryParams: [],
+      headers: [],
+      auth: { type: 'none' },
+      body: { type: 'none' },
+    };
+
+    const response = await executeHttpRequest(mockRequest);
+    expect(response.status).toBe(403);
+    expect(response.statusText).toBe('Forbidden');
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('should block requests to private IP ranges (SSRF protection)', async () => {
+    vi.stubGlobal('fetch', vi.fn());
+
+    const testIps = ['192.168.1.1', '10.0.0.5', '172.16.2.3', '169.254.1.1', '[::1]'];
+
+    for (const ip of testIps) {
+      const mockRequest: HttpRequest = {
+        id: `req-ssrf-${ip}`,
+        method: 'GET',
+        url: `http://${ip}/secure-data`,
+        queryParams: [],
+        headers: [],
+        auth: { type: 'none' },
+        body: { type: 'none' },
+      };
+
+      const response = await executeHttpRequest(mockRequest);
+      expect(response.status).toBe(403);
+    }
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
   it('should enforce rate limit and return 429 Too Many Requests on the 31st request', async () => {
     vi.stubGlobal(
       'fetch',

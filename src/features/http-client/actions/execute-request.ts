@@ -32,6 +32,20 @@ export async function executeHttpRequest(request: HttpRequest): Promise<HttpResp
     // 1. Build URL with enabled query parameters
     const urlObj = new URL(request.url);
 
+    // SSRF Protection: Block localhost and local IP addresses (private networks)
+    if (isPrivateOrLocalHost(urlObj.hostname)) {
+      return {
+        status: 403,
+        statusText: 'Forbidden',
+        headers: {},
+        data: '',
+        executionTimeMs: Math.round(performance.now() - startTime),
+        sizeBytes: 0,
+        isError: true,
+        errorDetails: 'Security restriction: Requests to localhost or local IP addresses are not allowed.',
+      };
+    }
+
     request.queryParams
       .filter((param) => param.enabled && param.key.trim() !== '')
       .forEach((param) => {
@@ -141,4 +155,49 @@ function getHttpStatusText(status: number): string {
     503: 'Service Unavailable',
   };
   return statusTexts[status] || 'Unknown Status';
+}
+
+function isPrivateOrLocalHost(hostname: string): boolean {
+  const host = hostname.toLowerCase();
+
+  // Basic string matches
+  if (host === 'localhost' || host === '0.0.0.0' || host.endsWith('.localhost')) {
+    return true;
+  }
+
+  // IPv4 check
+  const ipv4Pattern = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+  const match = host.match(ipv4Pattern);
+  
+  if (match) {
+    const p1 = parseInt(match[1], 10);
+    const p2 = parseInt(match[2], 10);
+    
+    // Check private ranges (RFC 1918 + loopback/link-local)
+    if (
+      p1 === 10 || // 10.0.0.0/8
+      p1 === 127 || // 127.0.0.0/8
+      (p1 === 172 && p2 >= 16 && p2 <= 31) || // 172.16.0.0/12
+      (p1 === 192 && p2 === 168) || // 192.168.0.0/16
+      (p1 === 169 && p2 === 254) // 169.254.0.0/16
+    ) {
+      return true;
+    }
+  }
+
+  // IPv6 local/private check (remove brackets for testing)
+  const v6Host = host.replace(/^\[|\]$/g, '');
+  if (
+    v6Host === '::1' || 
+    v6Host.startsWith('fc') || 
+    v6Host.startsWith('fd') || 
+    v6Host.startsWith('fe8') || 
+    v6Host.startsWith('fe9') || 
+    v6Host.startsWith('fea') || 
+    v6Host.startsWith('feb')
+  ) {
+    return true;
+  }
+
+  return false;
 }
