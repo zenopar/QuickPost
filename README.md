@@ -47,7 +47,7 @@ You can pull and run the pre-built image directly from the GitHub Container Regi
 docker run -p 3000:3000 -d ghcr.io/zenopar/quickpost:latest
 ```
 
-*Note: Add `-e ALLOW_LOCAL_REQUESTS=true` to your docker run command if you need to test local APIs.*
+*Note: By default, requests to local APIs and `localhost` are allowed. Add `-e ALLOW_LOCAL_REQUESTS=false` to your docker run command to block them.*
 
 ### Local Development
 
@@ -60,13 +60,13 @@ npm install
 ```
 
 **Environment Setup:**
-Copy the example environment file. By default, proxying requests to local IP addresses is blocked for security reasons.
+Copy the example environment file:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Open `.env.local` and set `ALLOW_LOCAL_REQUESTS=true` if you need to test local APIs (e.g., `localhost`).
+*(Optional) By default, requests to local APIs and `localhost` are allowed (`ALLOW_LOCAL_REQUESTS=true`). Set `ALLOW_LOCAL_REQUESTS=false` in `.env.local` if you wish to block requests to private/local networks.*
 
 Run the development server:
 
