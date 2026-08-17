@@ -3,14 +3,21 @@
 import * as React from "react"
 import { HttpRequest, HttpResponse, HttpMethod } from "../types"
 import { executeHttpRequest } from "../actions/execute-request"
+import { getDemoStatus, verifyDemoPassword, lockDemoSession } from "../actions/demo-mode"
 import { useStorageContext } from "./StorageContext"
 
 interface RequestContextValue {
   request: HttpRequest
   response: HttpResponse | null
   isLoading: boolean
+  isDemo: boolean
+  isUnlocked: boolean
   setRequest: React.Dispatch<React.SetStateAction<HttpRequest>>
   execute: () => Promise<void>
+  unlockDemo: (password: string) => Promise<{ success: boolean; error?: string }>
+  lockDemo: () => Promise<void>
+  openUnlockDialog: () => void
+  unlockDialogRef: React.RefObject<HTMLDialogElement | null>
 }
 
 const defaultRequest: HttpRequest = {
@@ -29,7 +36,36 @@ export function RequestProvider({ children }: { children: React.ReactNode }) {
   const [request, setRequest] = React.useState<HttpRequest>(defaultRequest)
   const [response, setResponse] = React.useState<HttpResponse | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
+  const [isDemo, setIsDemo] = React.useState(false)
+  const [isUnlocked, setIsUnlocked] = React.useState(true)
+  const unlockDialogRef = React.useRef<HTMLDialogElement | null>(null)
   const { addToHistory } = useStorageContext()
+
+  React.useEffect(() => {
+    getDemoStatus().then(status => {
+      setIsDemo(status.isDemo)
+      setIsUnlocked(status.isUnlocked)
+    }).catch(err => {
+      console.error("Failed to load demo status", err)
+    })
+  }, [])
+
+  const openUnlockDialog = () => {
+    unlockDialogRef.current?.showModal()
+  }
+
+  const unlockDemo = async (password: string) => {
+    const res = await verifyDemoPassword(password)
+    if (res.success) {
+      setIsUnlocked(true)
+    }
+    return res
+  }
+
+  const lockDemo = async () => {
+    await lockDemoSession()
+    setIsUnlocked(false)
+  }
 
   const execute = async () => {
     if (!request.url) return
@@ -57,7 +93,19 @@ export function RequestProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <RequestContext.Provider value={{ request, response, isLoading, setRequest, execute }}>
+    <RequestContext.Provider value={{
+      request,
+      response,
+      isLoading,
+      isDemo,
+      isUnlocked,
+      setRequest,
+      execute,
+      unlockDemo,
+      lockDemo,
+      openUnlockDialog,
+      unlockDialogRef
+    }}>
       {children}
     </RequestContext.Provider>
   )
@@ -70,3 +118,4 @@ export function useRequestContext() {
   }
   return context
 }
+

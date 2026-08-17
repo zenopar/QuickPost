@@ -3,12 +3,13 @@
 import * as React from "react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/Tabs"
 import { Badge } from "@/shared/components/ui/Badge"
+import { Button } from "@/shared/components/ui/Button"
 import { useRequestContext } from "../context/RequestContext"
 import { Loader2 } from "lucide-react"
 
 export function ResponseViewer() {
   const [activeTab, setActiveTab] = React.useState("body")
-  const { response, isLoading } = useRequestContext()
+  const { response, isLoading, openUnlockDialog, isDemo, isUnlocked } = useRequestContext()
 
   const getStatusVariant = (status: number) => {
     if (status >= 200 && status < 300) return "success"
@@ -74,9 +75,28 @@ export function ResponseViewer() {
         
         <div className="flex-1 p-4 overflow-y-auto">
           <TabsContent value="body" className="h-full mt-0">
-            <div className="h-full rounded-md border border-neutral-800 bg-neutral-900 p-4 font-mono text-sm text-neutral-300 overflow-auto whitespace-pre-wrap break-all">
-              {formatJSON(response.data) || <span className="italic text-neutral-600">No content</span>}
-            </div>
+            {response.errorDetails && !response.data ? (
+              <div className="h-full rounded-md border border-neutral-800 bg-neutral-900 p-4 font-mono text-xs overflow-auto whitespace-pre-wrap flex flex-col justify-between">
+                <div>
+                  <div className="text-sm font-semibold text-neutral-200 mb-2">{response.statusText}</div>
+                  <div className="text-neutral-400">{response.errorDetails}</div>
+                </div>
+                {isDemo && !isUnlocked && response.statusText.includes('Demo') && (
+                  <div className="pt-4 mt-4 border-t border-neutral-800 flex justify-start">
+                    <Button
+                      size="sm"
+                      onClick={openUnlockDialog}
+                    >
+                      Unlock Full Access
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="h-full rounded-md border border-neutral-800 bg-neutral-900 p-4 font-mono text-sm text-neutral-300 overflow-auto whitespace-pre-wrap break-all">
+                {formatJSON(response.data) || <span className="italic text-neutral-600">No content</span>}
+              </div>
+            )}
           </TabsContent>
           <TabsContent value="headers" className="h-full mt-0">
             <div className="rounded-md border border-neutral-800 bg-neutral-900 overflow-hidden">

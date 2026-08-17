@@ -3,22 +3,33 @@ import * as React from "react"
 import { Input } from "@/shared/components/ui/Input"
 import { Select } from "@/shared/components/ui/Select"
 import { Button } from "@/shared/components/ui/Button"
-import { Send, Loader2, BookmarkPlus } from "lucide-react"
+import { Send, Loader2, BookmarkPlus, Lock, Unlock } from "lucide-react"
 import { useRequestContext } from "../context/RequestContext"
 import { useStorageContext } from "../context/StorageContext"
 import { HttpMethod } from "../types"
 import { SaveRequestDialog } from "./SaveRequestDialog"
+import { DemoUnlockDialog } from "./DemoUnlockDialog"
 
 export function RequestPanel() {
-  const { request, setRequest, execute, isLoading } = useRequestContext()
+  const {
+    request,
+    setRequest,
+    execute,
+    isLoading,
+    isDemo,
+    isUnlocked,
+    openUnlockDialog,
+    lockDemo,
+    unlockDialogRef
+  } = useRequestContext()
   const { collections, addCollection } = useStorageContext()
-  const dialogRef = React.useRef<HTMLDialogElement>(null)
+  const saveDialogRef = React.useRef<HTMLDialogElement>(null)
 
   const handleOpenSaveDialog = () => {
     if (collections.length === 0) {
       addCollection("My Workspace")
     }
-    dialogRef.current?.showModal()
+    saveDialogRef.current?.showModal()
   }
 
   return (
@@ -42,7 +53,7 @@ export function RequestPanel() {
           <div className="flex-1 min-w-0">
             <Input
               type="text"
-              placeholder="https://api.example.com/v1/users"
+              placeholder={isDemo && !isUnlocked ? "https://echo.free.beeceptor.com" : "https://api.example.com/v1/users"}
               value={request.url}
               onChange={(e) => setRequest(prev => ({ ...prev, url: e.target.value }))}
               className="w-full font-mono text-sm"
@@ -51,6 +62,30 @@ export function RequestPanel() {
         </div>
 
         <div className="flex gap-2 w-full md:w-auto mt-2 md:mt-0">
+          {isDemo && (
+            !isUnlocked ? (
+              <Button
+                variant="outline"
+                onClick={openUnlockDialog}
+                className="gap-2 flex-1 md:flex-none text-neutral-300"
+                title="Demo Mode: Requests restricted to https://echo.free.beeceptor.com. Click to enter password."
+              >
+                <Lock size={15} className="text-amber-500" />
+                Unlock
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={lockDemo}
+                className="gap-2 flex-1 md:flex-none text-neutral-400 hover:text-rose-400"
+                title="Full access unlocked. Click to re-lock demo mode."
+              >
+                <Unlock size={15} className="text-emerald-500" />
+                Unlocked
+              </Button>
+            )
+          )}
+
           <Button variant="outline" onClick={handleOpenSaveDialog} className="gap-2 flex-1 md:flex-none">
             <BookmarkPlus size={16} />
             Save
@@ -63,7 +98,10 @@ export function RequestPanel() {
         </div>
       </div>
 
-      <SaveRequestDialog dialogRef={dialogRef} />
+      <SaveRequestDialog dialogRef={saveDialogRef} />
+      <DemoUnlockDialog dialogRef={unlockDialogRef} />
     </>
   )
 }
+
+

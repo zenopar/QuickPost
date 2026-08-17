@@ -3,6 +3,10 @@
 import { HttpRequest, HttpResponse } from '../types';
 import { checkRateLimit } from '../../../shared/lib/rate-limiter';
 import { getClientIp } from '../../../shared/utils/get-client-ip';
+import { isDemoUnlocked } from './demo-mode';
+import { isAllowedDemoUrl } from '../utils/demo-utils';
+
+
 
 export async function executeHttpRequest(request: HttpRequest): Promise<HttpResponse> {
   const startTime = performance.now();
@@ -31,6 +35,23 @@ export async function executeHttpRequest(request: HttpRequest): Promise<HttpResp
   try {
     // 1. Build URL with enabled query parameters
     const urlObj = new URL(request.url);
+
+    // Demo Mode Protection: If DEMO is enabled, requests are restricted to https://echo.free.beeceptor.com unless unlocked with PASS
+    if (process.env.DEMO === 'true') {
+      const unlocked = await isDemoUnlocked();
+      if (!unlocked && !isAllowedDemoUrl(request.url)) {
+        return {
+          status: 403,
+          statusText: 'Forbidden (Demo Mode)',
+          headers: {},
+          data: '',
+          executionTimeMs: Math.round(performance.now() - startTime),
+          sizeBytes: 0,
+          isError: true,
+          errorDetails: 'Demo mode restriction: Requests can only be sent to https://echo.free.beeceptor.com. Enter the access password to unlock full access.',
+        };
+      }
+    }
 
     // SSRF Protection: Block localhost and local IP addresses (private networks) unless explicitly allowed
     const allowLocal = process.env.ALLOW_LOCAL_REQUESTS === 'true';
