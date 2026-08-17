@@ -27,7 +27,7 @@ describe('executeHttpRequest Server Action', () => {
     vi.restoreAllMocks();
     resetRateLimiter(); // Reset Rate Limiter memory before each test
     mockCookieStore.clear();
-    process.env.ALLOW_LOCAL_REQUESTS = 'false';
+    process.env.ALLOW_LOCAL_REQUESTS = 'true';
     process.env.DEMO = 'false';
     delete process.env.PASS;
   });
@@ -152,27 +152,8 @@ describe('executeHttpRequest Server Action', () => {
     expect(response.errorDetails).toContain('Failed to fetch');
   });
 
-  it('should block requests to localhost (SSRF protection)', async () => {
-    vi.stubGlobal('fetch', vi.fn());
-
-    const mockRequest: HttpRequest = {
-      id: 'req-ssrf-local',
-      method: 'GET',
-      url: 'http://localhost:8080/admin',
-      queryParams: [],
-      headers: [],
-      auth: { type: 'none' },
-      body: { type: 'none' },
-    };
-
-    const response = await executeHttpRequest(mockRequest);
-    expect(response.status).toBe(403);
-    expect(response.statusText).toBe('Forbidden');
-    expect(fetch).not.toHaveBeenCalled();
-  });
-
-  it('should allow requests to localhost if ALLOW_LOCAL_REQUESTS is true', async () => {
-    process.env.ALLOW_LOCAL_REQUESTS = 'true';
+  it('should allow requests to localhost by default (ALLOW_LOCAL_REQUESTS default: true)', async () => {
+    delete process.env.ALLOW_LOCAL_REQUESTS;
     
     vi.stubGlobal(
       'fetch',
@@ -200,7 +181,28 @@ describe('executeHttpRequest Server Action', () => {
     expect(fetch).toHaveBeenCalled();
   });
 
-  it('should block requests to private IP ranges (SSRF protection)', async () => {
+  it('should block requests to localhost if ALLOW_LOCAL_REQUESTS is false', async () => {
+    process.env.ALLOW_LOCAL_REQUESTS = 'false';
+    vi.stubGlobal('fetch', vi.fn());
+
+    const mockRequest: HttpRequest = {
+      id: 'req-ssrf-local-blocked',
+      method: 'GET',
+      url: 'http://localhost:8080/admin',
+      queryParams: [],
+      headers: [],
+      auth: { type: 'none' },
+      body: { type: 'none' },
+    };
+
+    const response = await executeHttpRequest(mockRequest);
+    expect(response.status).toBe(403);
+    expect(response.statusText).toBe('Forbidden');
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('should block requests to private IP ranges if ALLOW_LOCAL_REQUESTS is false', async () => {
+    process.env.ALLOW_LOCAL_REQUESTS = 'false';
     vi.stubGlobal('fetch', vi.fn());
 
     const testIps = ['192.168.1.1', '10.0.0.5', '172.16.2.3', '169.254.1.1', '[::1]'];

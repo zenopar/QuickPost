@@ -53,8 +53,8 @@ export async function executeHttpRequest(request: HttpRequest): Promise<HttpResp
       }
     }
 
-    // SSRF Protection: Block localhost and local IP addresses (private networks) unless explicitly allowed
-    const allowLocal = process.env.ALLOW_LOCAL_REQUESTS === 'true';
+    // SSRF Protection: Block localhost and local IP addresses (private networks) if explicitly set to false (default: true)
+    const allowLocal = process.env.ALLOW_LOCAL_REQUESTS !== 'false';
     if (!allowLocal && isPrivateOrLocalHost(urlObj.hostname)) {
       return {
         status: 403,
